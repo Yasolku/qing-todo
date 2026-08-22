@@ -1,0 +1,79 @@
+{
+  "name": "qing-todo",
+  "version": "2.0.0",
+  "description": "轻量、常驻桌面的中文待办清单",
+  "main": "src/main.js",
+  "author": "Aryan Singh and contributors",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build:electron-builder": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "dist": "electron-builder"
+  },
+  "keywords": [
+    "electron",
+    "todo",
+    "widget",
+    "desktop",
+    "productivity"
+  ],
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.0",
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3",
+    "tailwindcss": "^4.2.0"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0"
+  },
+  "build": {
+    "appId": "app.qingtodo.desktop",
+    "productName": "轻待办",
+    "artifactName": "${productName}.${ext}",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "compression": "store",
+    "electronFuses": {
+      "runAsNode": false,
+      "enableCookieEncryption": true,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "onlyLoadAppFromAsar": true,
+      "loadBrowserProcessSpecificV8Snapshot": false,
+      "grantFileProtocolExtraPrivileges": false
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico",
+      "signAndEditExecutable": false
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon-png.png",
+      "category": "public.app-category.productivity"
+    },
+    "linux": {
+      "target": "AppImage",
+      "category": "Office"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "extraMetadata": {
+      "main": "src/main.js"
+    }
+  }
+}
+

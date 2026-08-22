@@ -1,0 +1,11 @@
+node_modules
+dist
+.npm-cache/
+.electron-cache*/
+.electron-builder-cache*/
+.local-app-data/
+smoke-profile/
+smoke-profile-*/
+debug-profile/
+*.log
+
