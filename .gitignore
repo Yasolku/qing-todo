@@ -7,5 +7,6 @@ dist
 smoke-profile/
 smoke-profile-*/
 debug-profile/
+debug-*/
 *.log
 
