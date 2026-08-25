@@ -34,6 +34,12 @@ Windows 打包：
 npm run build:win
 ```
 
+联网轻量安装器（小 EXE，安装时从 GitHub 下载运行环境）：
+
+```bash
+npm run build:win:web
+```
+
 生成文件位于 `dist/`。
 
 ## 安全设计

@@ -10,6 +10,7 @@
     "dev": "electron . --dev",
     "build:electron-builder": "electron-builder",
     "build:win": "electron-builder --win",
+    "build:win:web": "electron-builder --win nsis-web",
     "build:mac": "electron-builder --mac",
     "build:linux": "electron-builder --linux",
     "dist": "electron-builder"
@@ -42,7 +43,7 @@
       "assets/**/*",
       "package.json"
     ],
-    "compression": "store",
+    "compression": "maximum",
     "electronFuses": {
       "runAsNode": false,
       "enableCookieEncryption": true,
@@ -70,6 +71,12 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
+    },
+    "nsisWeb": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "qing-todo-web-setup-${version}.${ext}",
+      "appPackageUrl": "https://github.com/Yasolku/qing-todo/releases/latest/download"
     },
     "extraMetadata": {
       "main": "src/main.js"
