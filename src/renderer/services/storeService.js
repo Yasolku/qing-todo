@@ -41,3 +41,16 @@ export async function loadAlwaysOnTop() {
     }
 }
 
+export async function loadAppearance() {
+    try {
+        return await window.electronAPI.getStoreValue('appearance', 'midnight');
+    } catch (error) {
+        return 'midnight';
+    }
+}
+
+export async function saveAppearance(appearance) {
+    localStorage.setItem('qing-todo:appearance', appearance);
+    await window.electronAPI.setStoreValue('appearance', appearance);
+}
+

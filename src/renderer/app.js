@@ -1,4 +1,4 @@
-import { loadTasks, saveTasks, loadTheme, saveTheme, loadAlwaysOnTop } from './services/storeService.js';
+import { loadTasks, saveTasks, loadTheme, saveTheme, loadAlwaysOnTop, loadAppearance, saveAppearance } from './services/storeService.js';
 import { createTask, toggleTask, updateTask, deleteTask, listTasks } from './services/taskManager.js';
 import { Header } from './components/Header.js';
 import { TaskList } from './components/TaskList.js';
@@ -21,6 +21,7 @@ class AppState {
         this.isAlwaysOnTop = true;
         this.selectedDate = localDateString();
         this.showAllDays = false;
+        this.appearance = 'midnight';
     }
 }
 
@@ -38,6 +39,7 @@ class TodoWidgetApp {
         // 1. Load initial data
         this.state.currentTheme = await loadTheme();
         this.state.isAlwaysOnTop = await loadAlwaysOnTop();
+        this.state.appearance = await loadAppearance();
         const savedTasks = await loadTasks();
         this.state.tasks = savedTasks || [];
 
@@ -61,6 +63,8 @@ class TodoWidgetApp {
             onClearCompleted: () => this.handleClearCompleted()
         });
         this.setupDayFilter();
+        this.setupAppearance();
+        this.setupOrganizer();
 
         // 3. Setup Global Keyboard shortcuts
         this.setupKeyboardShortcuts();
@@ -68,6 +72,7 @@ class TodoWidgetApp {
         // 4. Initial Render
         this.updateUI();
         this.header.applyTheme(this.state.currentTheme);
+        this.applyAppearance(this.state.appearance);
         this.header.updateAlwaysOnTopButton(this.state.isAlwaysOnTop);
 
         // Auto-focus on app activation
@@ -194,6 +199,54 @@ class TodoWidgetApp {
         });
     }
 
+    setupAppearance() {
+        const panel = document.getElementById('appearancePanel');
+        document.getElementById('appearanceBtn')?.addEventListener('click', () => panel?.classList.toggle('hidden'));
+        panel?.querySelectorAll('[data-appearance]').forEach(button => button.addEventListener('click', async () => {
+            this.state.appearance = button.dataset.appearance;
+            this.applyAppearance(this.state.appearance);
+            await saveAppearance(this.state.appearance);
+            panel.classList.add('hidden');
+        }));
+        document.getElementById('customBackground')?.addEventListener('input', async event => {
+            this.state.appearance = 'custom';
+            this.applyAppearance('custom', event.target.value);
+            localStorage.setItem('qing-todo:custom-background', event.target.value);
+            await saveAppearance('custom');
+        });
+    }
+
+    applyAppearance(name, color) {
+        const app = document.getElementById('app');
+        app.dataset.appearance = name;
+        if (name === 'custom') {
+            const value = color || localStorage.getItem('qing-todo:custom-background') || '#8b5cf6';
+            app.style.setProperty('--app-background', `linear-gradient(145deg, ${value}, color-mix(in srgb, ${value} 45%, #111827))`);
+        } else {
+            app.style.removeProperty('--app-background');
+        }
+    }
+
+    setupOrganizer() {
+        const panel = document.getElementById('organizePanel');
+        const input = document.getElementById('organizeInput');
+        document.getElementById('organizeBtn')?.addEventListener('click', () => {
+            panel.classList.remove('hidden');
+            input.focus();
+        });
+        document.getElementById('closeOrganizeBtn')?.addEventListener('click', () => panel.classList.add('hidden'));
+        document.getElementById('organizeConfirmBtn')?.addEventListener('click', () => {
+            const items = splitIntoTasks(input.value);
+            if (!items.length) return;
+            const dueDate = this.state.showAllDays ? localDateString() : this.state.selectedDate;
+            items.slice(0, 50).reverse().forEach(text => { this.state = createTask(this.state, text, dueDate); });
+            this.persistTasks();
+            input.value = '';
+            panel.classList.add('hidden');
+            this.updateUI();
+        });
+    }
+
     selectRelativeDay(days) {
         this.state.selectedDate = shiftDate(this.state.selectedDate, days);
         this.state.showAllDays = false;
@@ -262,6 +315,19 @@ class TodoWidgetApp {
             }
         });
     }
+}
+
+export function splitIntoTasks(raw) {
+    if (typeof raw !== 'string') return [];
+    return raw
+        .replace(/\r/g, '')
+        .replace(/(?:^|\n)\s*(?:[-*•]|\d+[.)、])\s*/g, '\n')
+        .replace(/[。！？!?；;]+/g, '\n')
+        .replace(/(?:，|,)?\s*(?:然后|接着|随后|之后|最后|再去|并且)\s*/g, '\n')
+        .split(/\n+/)
+        .map(item => item.trim().replace(/^[，,、：:]|[，,、：:]$/g, ''))
+        .filter(item => item.length >= 2)
+        .map(item => item.slice(0, 300));
 }
 
 // Initialize the app when DOM is loaded

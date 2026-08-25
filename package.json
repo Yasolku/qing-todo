@@ -1,6 +1,6 @@
 {
   "name": "qing-todo",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "轻量、常驻桌面的中文待办清单",
   "main": "src/main.js",
   "author": "Aryan Singh and contributors",
@@ -76,4 +76,3 @@
     }
   }
 }
-

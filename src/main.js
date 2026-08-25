@@ -9,7 +9,7 @@ protocol.registerSchemesAsPrivileged([{
   privileges: { standard: true, secure: true, codeCache: true }
 }]);
 
-const ALLOWED_STORE_KEYS = new Set(['tasks', 'theme', 'alwaysOnTop']);
+const ALLOWED_STORE_KEYS = new Set(['tasks', 'theme', 'alwaysOnTop', 'appearance']);
 const MAX_TASKS = 500;
 const MAX_TASK_LENGTH = 300;
 const APP_ROOT = path.resolve(__dirname, '..');
@@ -24,6 +24,7 @@ const store = new Store({
     windowBounds: { width: 320, height: 480, x: 100, y: 100 },
     alwaysOnTop: true,
     theme: 'dark',
+    appearance: 'midnight',
     tasks: []
   }
 });
@@ -277,6 +278,7 @@ ipcMain.handle('set-store-value', (event, key, value) => {
   if (key === 'tasks') store.set(key, sanitizeTasks(value));
   if (key === 'theme' && (value === 'dark' || value === 'light')) store.set(key, value);
   if (key === 'alwaysOnTop' && typeof value === 'boolean') store.set(key, value);
+  if (key === 'appearance' && ['midnight', 'snow', 'rose', 'ocean', 'sunset', 'custom'].includes(value)) store.set(key, value);
   return true;
 });
 
